@@ -15,6 +15,7 @@ import (
 var (
 	total         int64
 	orderNotFound = "Order not found"
+	forbidden     = "Access Forbidden"
 )
 
 const deletedNull = "deleted_at IS NULL"
@@ -70,6 +71,10 @@ func CreateProduct(c *fiber.Ctx) error {
 		return helper.HandleErrorResponse(c, fiber.StatusUnauthorized, "Invalid token", err)
 	}
 
+	if user.Role != "admin" {
+		return helper.HandleErrorResponse(c, fiber.StatusForbidden, forbidden, nil)
+	}
+
 	product := model.Product{
 		Model:         gorm.Model{},
 		Code:          code,
@@ -107,7 +112,7 @@ func UpdateProduct(c *fiber.Ctx) error {
 	}
 
 	if userLogin.Role != "admin" {
-		return helper.HandleErrorResponse(c, fiber.StatusForbidden, "Access Forbidden", nil)
+		return helper.HandleErrorResponse(c, fiber.StatusForbidden, forbidden, nil)
 	}
 
 	db := database.DB
@@ -135,7 +140,7 @@ func DeleteProduct(c *fiber.Ctx) error {
 	}
 
 	if userLogin.Role != "admin" {
-		return helper.HandleErrorResponse(c, fiber.StatusForbidden, "Access Forbidden", nil)
+		return helper.HandleErrorResponse(c, fiber.StatusForbidden, forbidden, nil)
 	}
 
 	err = db.Where(deletedNull).Delete(&product, model.Product{Code: code}).Error

@@ -1,14 +1,18 @@
 package types
 
-type LoginInput struct {
+type User struct {
+	ID       uint   `json:"id"`
+	Name     string `json:"name"`
 	Username string `json:"username"`
-	Password string `json:"password"`
+	Role     string `json:"role"`
 }
-type Register struct {
+
+type UpdateUser struct {
 	ID              uint   `json:"id"`
 	Name            string `json:"name"`
 	Username        string `json:"username"`
+	Role            string `json:"role"`
+	CurrentPassword string `json:"currentPassword"`
 	Password        string `json:"password"`
 	ConfirmPassword string `json:"passwordConfirm"`
-	Role            string `json:"role"`
 }

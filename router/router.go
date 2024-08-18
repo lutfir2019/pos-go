@@ -19,27 +19,30 @@ func SetupRoutes(app *fiber.App) {
 	// Auth
 	auth := api.Group("/auth")
 	auth.Post("/login", handler.Login)
+	auth.Post("/register", handler.Register)
+	auth.Post("/danger-secret-side-create-admin", handler.CreatAdmin)
 
 	// User
 	user := api.Group("/user")
-	user.Get("/", handler.GetAllUsers)
-	user.Get("/:id", handler.GetUser)
-	user.Post("/", handler.CreateUser)
-	user.Put("/:id", middleware.Protected(), handler.UpdateUser)
-	user.Delete("/:id", middleware.Protected(), handler.DeleteUser)
+	user.Post("/create-user", middleware.Protected(), handler.CreateUser)
+	user.Get("/get-users", middleware.Protected(), handler.GetAllUsers)
+	user.Get("/get-user", middleware.Protected(), handler.GetUser)
+	user.Put("/:username/update-user", middleware.Protected(), handler.UpdateUser)
+	user.Delete("/:username/delete-user", middleware.Protected(), handler.DeleteUser)
 
 	// Product
 	product := api.Group("/product")
-	product.Get("/", handler.GetAllProducts)
-	product.Get("/:id", handler.GetProduct)
-	product.Post("/", middleware.Protected(), handler.CreateProduct)
-	product.Delete("/:id", middleware.Protected(), handler.DeleteProduct)
+	product.Post("/create-product", middleware.Protected(), handler.CreateProduct)
+	product.Get("/get-products", middleware.Protected(), handler.GetAllProducts)
+	product.Get("/:code/get-product", middleware.Protected(), handler.GetProduct)
+	product.Put("/:code/update-product", middleware.Protected(), handler.UpdateProduct)
+	product.Delete("/:code/delete-product", middleware.Protected(), handler.DeleteProduct)
 
 	// Order
 	order := api.Group("/order")
-	order.Get("/", handler.GetOrders)
-	order.Post("/", handler.CreateOrder)
-	order.Get("/:id", handler.GetOrderByID)
-	order.Put("/:id", handler.UpdateOrder)
-	order.Delete("/:id", handler.DeleteOrder)
+	order.Get("/", middleware.Protected(), handler.GetOrders)
+	order.Post("/", middleware.Protected(), handler.CreateOrder)
+	order.Get("/:id", middleware.Protected(), handler.GetOrderByID)
+	order.Put("/:id", middleware.Protected(), handler.UpdateOrder)
+	order.Delete("/:id", middleware.Protected(), handler.DeleteOrder)
 }

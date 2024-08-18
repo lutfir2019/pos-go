@@ -7,10 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var (
-	orderNotFound = "Order not found"
-)
-
 // GetOrders mengembalikan daftar pesanan
 func GetOrders(c *fiber.Ctx) error {
 	var orders []model.Order

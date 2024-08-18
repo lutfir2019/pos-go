@@ -1,0 +1,7 @@
+# .air.toml
+[build]
+cmd = "go build -o ./main ."
+bin = "./main"
+include_dir = ["."]
+exclude_dir = ["assets", "tmp", "vendor"]
+log = "air.log"

@@ -37,7 +37,7 @@ func ConnectDB() {
 
 	fmt.Println("Connection Opened to Database")
 	// Auto migrate models
-	err = DB.AutoMigrate(&model.Product{}, &model.User{}, &model.Order{}, &model.OrderItem{})
+	err = DB.AutoMigrate(&model.User{}, &model.Product{}, &model.Order{}, &model.OrderItem{}, &model.ProductCounter{})
 	if err != nil {
 		panic("failed to migrate database")
 	}

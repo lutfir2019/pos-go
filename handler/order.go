@@ -35,6 +35,12 @@ func CreateOrder(c *fiber.Ctx) error {
 		Items:  input.Items,
 	}
 
+	for _, item := range input.Items {
+		var prd model.Product
+		database.DB.First(&prd, item.ProductID)
+		database.DB.Model(&model.Product{}).Where("id =?", item.ProductID).Updates(model.Product{Quantity: prd.Quantity - uint(item.Quantity)})
+	}
+
 	database.DB.Create(&order)
 	return c.JSON(fiber.Map{"status": "success", "message": "Success create order", "data": order})
 }

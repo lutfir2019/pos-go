@@ -36,16 +36,9 @@ func GetProduct(c *fiber.Ctx) error {
 
 	var product types.Products
 	err := db.Model(&model.Product{}).
-		Select(`
-			products.*, 
-			users.name as refer_user, 
-			COALESCE(products.quantity - SUM(order_items.quantity), products.quantity) as quantity
-		`).
+		Select("products.*, users.name as user_name").
 		Joins("left join users on users.id = products.refer_user").
-		Joins("left join order_items on order_items.product_id = products.id").
-		Joins("left join orders on orders.id = order_items.order_id").
 		Where(deletedNull).
-		Group("products.id, users.name").
 		First(&product, model.Product{Code: code}).
 		Count(&total).Error
 

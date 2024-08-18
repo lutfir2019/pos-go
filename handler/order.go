@@ -2,9 +2,11 @@ package handler
 
 import (
 	"api-fiber-gorm/database"
+	"api-fiber-gorm/helper"
 	"api-fiber-gorm/model"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 // GetOrders mengembalikan daftar pesanan
@@ -16,10 +18,23 @@ func GetOrders(c *fiber.Ctx) error {
 
 // CreateOrder membuat pesanan baru
 func CreateOrder(c *fiber.Ctx) error {
-	order := new(model.Order)
-	if err := c.BodyParser(order); err != nil {
+	input := new(model.Order)
+	if err := c.BodyParser(input); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
+
+	user, err := helper.ConvertJWT(c)
+	if err != nil {
+		return helper.HandleErrorResponse(c, fiber.StatusUnauthorized, "Invalid token", err)
+	}
+
+	order := model.Order{
+		Model:  gorm.Model{},
+		UserID: user.ID,
+		Total:  input.Total,
+		Items:  input.Items,
+	}
+
 	database.DB.Create(&order)
 	return c.JSON(fiber.Map{"status": "success", "message": "Success create order", "data": order})
 }

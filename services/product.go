@@ -32,9 +32,17 @@ func GetAllProducts(c *fiber.Ctx, sts int, msg string, page int, limit int, offs
 	}
 
 	err := db.Model(&model.Product{}).
-		Select("products.*, users.name as refer_user").
+		Select(`
+			products.*, 
+			users.name as refer_user, 
+			COALESCE(products.quantity - SUM(order_items.quantity), products.quantity) as quantity
+		`).
 		Joins("left join users on users.id = products.refer_user").
-		Where("products.deleted_at IS NULL").Order("ID DESC").
+		Joins("left join order_items on order_items.product_id = products.id").
+		Joins("left join orders on orders.id = order_items.order_id").
+		Where("products.deleted_at IS NULL").
+		Group("products.id, users.name").
+		Order("products.id DESC").
 		Offset(offset).
 		Limit(limit).
 		Scan(&products).Error
@@ -47,7 +55,8 @@ func GetAllProducts(c *fiber.Ctx, sts int, msg string, page int, limit int, offs
 	}
 
 	// Get total count of products
-	err = db.Model(&model.Product{}).Where(deletedNull).Count(&total).Error
+	var total int64
+	err = db.Model(&model.Product{}).Where("products.deleted_at IS NULL").Count(&total).Error
 	if err != nil {
 		return helper.HandleErrorResponse(c, fiber.StatusBadRequest, err.Error(), err)
 	}
